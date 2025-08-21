@@ -25,3 +25,6 @@ venv.bak/
 
 # Claude
 .claude/
+
+# uv
+uv.lock
