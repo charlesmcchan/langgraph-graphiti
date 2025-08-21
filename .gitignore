@@ -28,3 +28,6 @@ venv.bak/
 
 # uv
 uv.lock
+
+# Chainlit
+.chainlit
