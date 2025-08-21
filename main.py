@@ -1,22 +1,35 @@
 import chainlit as cl
-import openai
 import os
+from langchain_openai import ChatOpenAI
+from langgraph.graph import StateGraph, MessagesState
+from langchain_core.messages import HumanMessage
+
+llm = ChatOpenAI(
+    model="gpt-3.5-turbo",
+    api_key=os.getenv("OPENAI_API_KEY"),
+    streaming=True
+)
+
+def llm_node(state: MessagesState):
+    response = llm.invoke(state["messages"])
+    return {"messages": [response]}
+
+graph = StateGraph(MessagesState)
+graph.add_node("llm", llm_node)
+graph.set_entry_point("llm")
+graph.set_finish_point("llm")
+agent = graph.compile()
 
 @cl.on_message
 async def main(message: cl.Message):
-    client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": message.content}],
-        stream=True
-    )
-    
     msg = cl.Message(content="")
     
-    for chunk in response:
-        if chunk.choices[0].delta.content is not None:
-            await msg.stream_token(chunk.choices[0].delta.content)
+    async for chunk in agent.astream(
+        {"messages": [HumanMessage(content=message.content)]},
+        stream_mode="messages"
+    ):
+        if chunk[0].content:
+            await msg.stream_token(chunk[0].content)
     
     await msg.send()
 
