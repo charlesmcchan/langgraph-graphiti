@@ -4,13 +4,10 @@ A Chainlit chat application that integrates LangGraph with Graphiti's MCP (Model
 
 ## Features
 
-- **Multi-User Authentication**: Password-based login system with isolated user sessions
-- **Per-User Memory**: Each user's conversations are stored separately using unique group IDs
+- **ChainLit Integration**: Leverages ChainLit for chat UI and authentication
 - **LangGraph Integration**: Uses LangGraph's StateGraph for conversation flow
-- **Graphiti Memory**: Connects to Graphiti MCP server for persistent conversation memory
-- **OpenAI GPT-5 Nano**: Powered by OpenAI's latest GPT-5 nano model
-- **Real-time Streaming**: Supports streaming responses through Chainlit interface
-- **Memory Context**: Automatically retrieves relevant context from previous conversations
+- **Graphiti Integration**: Connects to Graphiti MCP server for persistent conversation memory
+- **Multi-tenancy**: Each user's conversations are stored separately using unique group IDs
 
 ## Prerequisites
 
@@ -46,8 +43,20 @@ uv run chainlit run main.py
 
 The application will open in your browser. You'll be prompted to log in with a username and password (any non-empty values work for demo purposes). Each user's conversations and memory are isolated from other users.
 
-## Authentication
+## Architecture
 
+### Authentication
 - Users must authenticate with a username and password
 - Each user gets isolated memory storage using `user-{username}` as the group ID
 - Memory and conversation history are completely separated between users
+
+### Memory System
+- Uses Graphiti MCP server with SSE transport for persistent memory
+- Memory is retrieved using the `search_memory_nodes` tool with user-specific group IDs
+- Stores conversation episodes with user messages only (assistant responses excluded for efficiency)
+- Context is injected as system messages to provide conversational continuity
+
+## Reference
+- [Chainlit](https://chainlit.io)
+- [Graphiti](https://github.com/getzep/graphiti)
+- [LangChain MCP Adapter](https://github.com/langchain-ai/langchain-mcp-adapters)
