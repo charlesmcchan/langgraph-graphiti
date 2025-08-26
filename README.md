@@ -38,8 +38,9 @@ A Chainlit chat application that integrates LangGraph with Graphiti's MCP (Model
 
 Start the Chainlit server:
 ```bash
-uv run chainlit run main.py
+uv run chainlit run main.py --port 3000
 ```
+NOTE: Graphiti MCP runs on port 8000 which conflicts with the default port chainlit runs on
 
 The application will open in your browser. You'll be prompted to log in with a username and password (any non-empty values work for demo purposes). Each user's conversations and memory are isolated from other users.
 
